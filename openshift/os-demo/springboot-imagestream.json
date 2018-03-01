@@ -1,0 +1,25 @@
+{
+    "kind": "ImageStream",
+    "apiVersion": "v1",
+    "metadata": {
+        "name": "springboot"
+    },
+    "spec": {
+        "tags": [
+            {
+                "name": "latest",
+                "annotations": {
+                    "description": "Spring Boot S2I Image CentOS based",
+                    "iconClass": "icon-jboss",
+                    "tags": "builder,springboot,java,maven",
+                    "supports": "springboot,java:8,maven",
+                    "version": "1.0"
+                },
+            "from": {
+              "kind": "DockerImage",
+              "name": "docker.io/veermuchandi/spring-mvn-base:latest"
+            }
+            }
+        ]
+    }
+}

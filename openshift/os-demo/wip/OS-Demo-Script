@@ -1,0 +1,145 @@
+# Login to box https://10.1.2.2:8443/console
+# oc login https://10.1.2.2:8443/
+oc version
+# Check component status
+# oc get cs
+# check master is running
+#kubectl cluster-info
+# Get nodes info
+oc get nodes
+# Lets createa project and run a run a pod now.
+oc new-project barclaysdemo1 --display-name="Barclays Demo1"
+oc get all
+oc run ngnix-server --image=nginx --replicas=2 --port=80
+oc get pods
+# get all artifacts. Check out the DC and RC
+oc get all
+# lets review the replication controler
+oc get dc ngnix-server
+oc edit rc ngnix-server-1
+# expose port 80 for replication controller named ngnix-server-1
+# Get some help
+oc expose rc ngnix-server-1 --port=80 --type=LoadBalancer
+# expose a service for external access
+oc expose rc ngnix-server-1 --name=rc-service-ngnix
+#############################
+# describe components
+#############################
+oc describe dc ngnix-rc-name
+oc describe rc  ngnix-rc-name-1
+oc describe service rc-expose-service-ngnix
+#############################
+# edit components
+#############################
+oc edit dc ngnix-rc-name -o json 
+oc edit rc ngnix-rc-name-1 -o yaml
+# check the values for IP and EndPoints
+oc edit service rc-expose-service-ngnix
+# check the pods out
+oc describe pod ngnix-rc-name-1-1wgor
+oc edit pod ngnix-rc-name-1-1wgor
+
+# curl serviceIP:80
+curl podip:80
+# create your rc and no dc.oc 
+vi nginx.yaml
+oc create -f nginx.yaml 
+oc edit rc ngnix-rc
+
+oc delete pod <<pod-name>>
+# oc stop dc or oc stop service did not work. How toprovide dc name.
+#############################
+# Create rc with memory and cpu limits.
+#############################
+oc run ngnix-rc-name --image=nginx --replicas=2 --port=80 --labels="env=QA,AppName=AddressLookup,Owner=Anurag,version=1.4" --limits="cpu=1000m,memory=200Mi" --requests="cpu=500m,memory=100Mi" --dry-run
+
+# oc run ngnix-rc-name --image=nginx --replicas=2 --port=80 --labels="env=QA,AppName=AddressLookup,Owner=Anurag,version=1.4" --limits="cpu=1000m,memory=200Mi" --requests="cpu=500m,memory=100Mi"
+###---> Not working --> oc run ngnix-rc-name-2 --image=nginx --replicas=2 --port=80 --labels="env=Test,AppName=AddressLookup,Owner=Anurag,version=1.4" --limits="cpu=1000m,memory=200Mi" --requests="cpu=500m,memory=100Mi"
+# Filter pods by label
+oc get pod -l Owner=Anurag
+
+# Deleting the rc will delete all pods.
+oc delete rc ngnix-rc-name-1
+
+# expose a service for external access using filters on pods.
+
+#############################
+# Understanding PV and PVC
+#############################
+
+cat pv4G.yaml
+oc create -f pv4G.yaml 
+cat pv3G.yaml
+oc create -f pv3G.yaml
+cat pvclaim.yaml
+oc create -f pvclaim.yaml 
+oc get pvc
+cat nginx-pv.yaml 
+oc create -f nginx-pv.yaml
+# Issue--> cirl ip:80 did not work.
+ 
+
+#############################
+# secrets
+#############################
+echo "admin" | base64
+cat secret.json
+oc create -f secret.json
+oc get secret
+oc describe secret secret-test
+# How to find where secrets are used?
+oc create -f pod-using-secret.json
+oc rsh pod-using-secret
+cat /tmp/secret-volume/password
+
+#############################
+# Service Accounts
+#############################
+oc get serviceaccounts
+
+#############################
+# NameSpaces=Projects
+#############################
+oc get namespaces
+oc get projects
+oc new-project demo2
+oc get pods
+oc get pods --all-namespaces
+oc project demo1
+oc delete project demo2
+oc describe project demo1
+oc create -f limits.yaml 
+oc create -f pod-greedy.yaml 
+
+#############################
+# Scaling and Rolling Depoyments
+#############################
+oc run ngnix-pod --image=nginx --replicas=2 
+oc get pods
+oc scale rc ngnix-pod-1 --replicas=6
+oc get pods
+
+#############################
+# API
+#############################
+#https://10.1.2.2:8443/swaggerapi/oapi/v1
+#http://openshiftv3swagger-sabre1041.rhcloud.com/
+
+
+oc describe policyBindings :default -n devtest
+oc describe clusterPolicyBindings :default
+
+File structure.
+
+oc get nodes -o json | jq '.items[] | {name: .metadata.name, capacity: .status.capacity}'
+
+
+
+
+create -f docs/admin/resourcequota/compute-resources.yaml --namespace=quota-example
+resourcequota "compute-resources" created
+
+    
+    
+
+

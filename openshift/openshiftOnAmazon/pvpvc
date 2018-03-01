@@ -1,0 +1,102 @@
+
+https://docs.openshift.com/container-platform/3.3/install_config/persistent_storage/persistent_storage_nfs.html#overview
+
+mkdir /osdata
+fdisk -l 
+fdisk /dev/vdd
+mkfs.xfs /dev/vdd1
+blkid
+vi /etc/fstab 
+partprobe
+mount /osdata
+df -h
+
+On NFS/bastion
+[root@asaran-clust1-bastion2 osdata]# for vol in $(seq 1 9); do mkdir /osdata/vol0${vol} ; done
+[root@asaran-clust1-bastion2 osdata]# for vol in $(seq 10 15); do mkdir /osdata/vol${vol} ; done
+Create NFS export file /etc/exports.d/openshift.exports
+
+/osdata/vol01 *(rw,root_squash)
+/osdata/vol02 *(rw,root_squash)
+/osdata/vol03 *(rw,root_squash)
+/osdata/vol04 *(rw,root_squash)
+/osdata/vol05 *(rw,root_squash)
+/osdata/vol06 *(rw,root_squash)
+/osdata/vol07 *(rw,root_squash)
+/osdata/vol08 *(rw,root_squash)
+/osdata/vol09 *(rw,root_squash)
+/osdata/vol10 *(rw,root_squash)
+/osdata/vol11 *(rw,root_squash)
+/osdata/vol12 *(rw,root_squash)
+/osdata/vol13 *(rw,root_squash)
+/osdata/vol14 *(rw,root_squash)
+/osdata/vol15 *(rw,root_squash)
+[root@asaran-clust1-bastion2 exports.d]#  chmod 770 /osdata/*
+[root@asaran-clust1-bastion2 exports.d]# exportfs -arv
+exporting *:/osdata/vol15
+exporting *:/osdata/vol14
+exporting *:/osdata/vol13
+exporting *:/osdata/vol12
+exporting *:/osdata/vol11
+exporting *:/osdata/vol10
+exporting *:/osdata/vol09
+exporting *:/osdata/vol08
+exporting *:/osdata/vol07
+exporting *:/osdata/vol06
+exporting *:/osdata/vol05
+exporting *:/osdata/vol04
+exporting *:/osdata/vol03
+exporting *:/osdata/vol02
+exporting *:/osdata/vol01
+exporting *:/exports/logging
+exporting *:/exports/metrics
+exporting *:/exports/registry
+[root@asaran-clust1-bastion2 exports.d]# exportfs
+
+Provisioning
+PV Object Definition Using NFS
+ echo '{
+  "apiVersion": "v1",
+  "kind": "PersistentVolume",
+  "metadata": {
+    "name": "vol09-data"
+  },
+  "spec": {
+    "capacity": {
+        "storage": "5Gi"
+        },
+    "accessModes": [ "ReadWriteOnce" ],
+    "nfs": {
+        "path": "/osdata/vol09",
+        "server": "172.19.23.32"
+    }
+  }
+}' | oc create -f -
+
+  
+[root@asaran-clust1-master3 ~]# oc create -f nfs-pv.yaml
+persistentvolume "pv00011" created
+
+[root@asaran-clust1-master3 ~]# oc get pv
+NAME              CAPACITY   ACCESSMODES   STATUS      CLAIM                                 REASON    AGE
+logging-volume    60Gi       RWO           Available                                                   8h
+metrics-volume    50Gi       RWO           Bound       openshift-infra/metrics-cassandra-1             8h
+pv00011           100Gi      RWO           Available                                                   24s
+registry-volume   70Gi       RWX           Bound       default/registry-claim                          8h
+[root@asaran-clust1-master3 ~]# 
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: jenkins
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  volumeName: jenkins-data
+
+oc create -f jenkins-claim.yaml
+
+

@@ -1,0 +1,29 @@
+# yum install cockpit cockpit-kubernetes
+Once installed create a rule for port tcp/9090 in iptables and start the cockpit service.
+#  iptables -A INPUT -p tcp -m state --state NEW -m tcp --dport 9090 -j ACCEPT
+# systemctl enable cockpit.service --now
+
+[root@asaran-clust1-master1 ~]# passwd
+Changing password for user root.
+New password: 
+BAD PASSWORD: The password is shorter than 8 characters
+Retype new password: 
+Sorry, passwords do not match.
+New password: 
+Retype new password: 
+passwd: all authentication tokens updated successfully.
+[root@asaran-clust1-master1 ~]# systemctl status cockpit
+● cockpit.service - Cockpit Web Service
+   Loaded: loaded (/usr/lib/systemd/system/cockpit.service; static; vendor preset: disabled)
+   Active: active (running) since Fri 2017-01-20 19:20:03 EST; 1min 58s ago
+   
+Login : https://master1.anuragsdemo.com:9090/system
+root/admin2017
+
+Cockpit is not required to be installed on other hosts to retrieve OpenShift/Kubenetes Cluster information from your nodes and projects.
+Adding other hosts to the system dashboard.
+
+In order to add other hosts to the Dashboard cockpit will need to be installed on the remote host and port 9090 will need to be opened, see steps above.
+Once cockpit is installed on the remote host you can add the remote host to your current dashboard by clicking on the dashboard tab and blue plus button. The remote hosts dashboard can be seen with out this by directly accessing its URL as well.
+Once the blue plus button is clicked, add the IP address or hostname of the remote host. The next step will be to log in with user name and password that you would use to log into that remote host. If ssh keys were added and a password is not need to access that host via ssh, you will not be prompted to provide that information.
+

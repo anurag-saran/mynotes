@@ -1,0 +1,31 @@
+
+you can delete old containers on the node:
+sudo docker rm $(sudo docker ps -a | grep Exited | awk '{print $1}')
+sudo docker rm $(sudo docker ps -a | grep Dead | awk '{print $1}')
+sudo docker rmi $(sudo docker images -qaf 'dangling=true')
+
+Prune Images:
+https://docs.openshift.com/container-platform/3.4/admin_guide/pruning_resources.html
+oadm prune deployments --orphans --keep-complete=2 --keep-failed=1     --keep-younger-than=60m --confirm
+oadm prune builds --orphans --keep-complete=2 --keep-failed=1     --keep-younger-than=60m --confirm
+oadm prune images --keep-tag-revisions=2 --keep-younger-than=60m --confirm
+ 
+Garbage Collection:
+https://docs.openshift.com/container-platform/3.3/admin_guide/garbage_collection.html
+vi /etc/origin/node/node-config.yaml
+ 
+kubeletArguments:
+  minimum-container-ttl-duration:
+    - "10s"
+  maximum-dead-containers-per-container:
+    - "2"
+  maximum-dead-containers:
+    - "50"
+kubeletArguments:
+  image-gc-high-threshold:
+    - "90"
+  image-gc-low-threshold:
+    - "80"
+
+ systemctl restart atomic-openshift-node
+ systemctl status atomic-openshift-node

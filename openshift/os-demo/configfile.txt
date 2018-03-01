@@ -1,0 +1,1 @@
+This can be a xml file or a jason file or a key value file.

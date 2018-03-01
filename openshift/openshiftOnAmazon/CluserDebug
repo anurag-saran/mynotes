@@ -1,0 +1,28 @@
+
+
+
+journalctl -r -u atomic-openshift-master-controllers
+journalctl -r -u atomic-openshift-master-api
+# Single master
+systemctl restart atomic-openshift-master
+journalctl -r -u atomic-openshift-master
+# etcd
+systemctl restart etcd
+# SDN & node
+systemctl restart atomic-openshift-node
+systemctl restart openvswitch 
+systemctl restart docker
+#ovs-vsctl del-br br0
+
+systemctl status atomic-openshift-master-controllers -l
+systemctl status atomic-openshift-master-api -l
+systemctl status atomic-openshift-master -l
+systemctl status atomic-openshift-node -l
+systemctl status etcd -l
+systemctl status openvswitch -l
+systemctl status docker -l
+
+systemctl restart openvswitch 
+systemctl restart atomic-openshift-node
+systemctl restart openvswitch 
+systemctl restart docker

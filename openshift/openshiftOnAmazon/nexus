@@ -1,0 +1,36 @@
+https://github.com/sonatype/docker-rhel-nexus
+
+# Use anyuid SCC to allow Nexus to run as UID 200 
+oc new-project nexus
+oc project nexus
+oc adm policy add-scc-to-group anyuid system:serviceaccounts:nexus
+[root@asaran-clust1-master1 OpenShift]# oc create -f nexus-rhel.json -n nexus
+buildconfig "nexus" created
+imagestream "rhel7" created
+imagestream "nexus" created
+template "nexus" created
+
+    echo '{
+  "apiVersion": "v1",
+  "kind": "PersistentVolume",
+  "metadata": {
+    "name": "nexus-data"
+  },
+  "spec": {
+    "capacity": {
+        "storage": "10Gi"
+        },
+    "accessModes": [ "ReadWriteOnce" ],
+    "nfs": {
+        "path": "/osdata/vol11",
+        "server": "172.19.23.32"
+    }
+  }
+}' | oc create -f -
+
+?Update the template to use 10Gig? If there is a mismatch will it use 10Gi or 2 Gi?
+
+
+
+
+oc new-app --template="nexus/nexus"

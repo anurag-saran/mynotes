@@ -1,0 +1,117 @@
+Access Key ID:
+AKIAJQ6QJWOENVFXOZNA
+Secret Access Key:
+IXc2Z7JhJvJN3mtro9s1END/IaB2L8p+tAfAB27P
+
+
+REQUEST= MINIMUM AMOUNT (GUARANTEED)
+LIMIT = MAXIMUM BURST (IF AVAILABLE)
+OVERCOMMIT= RATIO OF LIMIT TO REQUEST
+REQUEST=Limit=No Overcommitment.
+Node Overcommit=POD has no limits defined. Or limit total is more.
+Cluster Overcommit=You have allocated more at project level.
+BEST EFFORT=NO RESOURCE REQUIREMENTS
+BURSTABLE=REQUESTS < LIMITS
+GUARANTEED=REQUESTS == LIMITS
+BEWARE,WORKLOAD SLA , EVICTION
+
+
+oc new-project testing-quota-limit
+# Quota that controls object counts
+
+cat <<EOF > object-counts.yaml
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: object-counts
+spec:
+  hard:
+    persistentvolumeclaims: "2"
+    services: "2"
+    pods: "5"
+EOF
+
+
+oc create -f object-counts.yaml --namespace=testing-quota-limit
+
+# describe the quota to see what is currently being consumed
+oc describe quota object-counts --namespace=testing-quota-limit
+
+# limit the amount of compute resource that can be consumed.
+# It will enforce that each container in a pod makes a request and defines a limit for cpu and memory
+# Quota like FireMarshal. Aggregate resurce counting.
+
+cat <<EOF > compute-resources.yaml
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: compute-resources
+spec:
+  hard:
+    requests.cpu: "1"
+    requests.memory: 1Gi 
+    limits.cpu: "2"
+    limits.memory: 2Gi
+EOF
+
+oc create -f compute-resources.yaml --namespace=testing-quota-limit
+
+# see what is currently being consumed 
+oc describe quota compute-resources --namespace=testing-quota-limit
+oc run nginx --image=nginx 
+oc get dc
+oc describe nginx
+oc run nginx-limit \
+  --image=nginx \
+  --replicas=1 \
+  --requests=cpu=100m,memory=256Mi \
+  --limits=cpu=200m,memory=512Mi 
+
+# Limits=Doorman. Assings default/Min/Max/overcommit-ratio. Please define your ranges.
+cat <<EOF > limits-range.yaml
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: limits
+spec:
+  limits:
+  - default:
+      cpu: 200m
+      memory: 512Mi
+    defaultRequest:
+      cpu: 100m
+      memory: 256Mi
+    type: Container
+EOF
+
+oc create -f  limits-range.yaml --namespace=testing-quota-limit
+oc describe limits limits --namespace=testing-quota-limit
+oc run nginx-2 --image=nginx
+oc run nginx-limit \
+  --image=nginx \
+  --replicas=1 \
+  --requests=cpu=100m,memory=256Mi \
+  --limits=cpu=200m,memory=512Mi 
+
+# Review Results
+oc describe quota compute-resources --namespace=testing-quota-limit
+oc describe quota object-counts --namespace=testing-quota-limit
+
+
+Developer Onboarding.
+Operational Env
+
+Webshpehre ND to Liberty
+
+docker built -t eap7-base:702
+  422  docker built -t eap7-base:702 .
+  423  docker build -t eap7-base:702 .
+  424  docker images
+  425  docker run -p 8080:8080 -p 9990:9990 eap7-base:702
+  426  git add -A
+
+
+
+
+
+

@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+
+########################
+# include the master
+########################
+. demo-master.sh
+DEMO_PROMPT="${GREEN}anurags-MBP-2:os-demos anuragsaran$  ${BLACK}"
+clear
+
+
+echo "# Login to box https://10.1.2.2:8443/console"
+# echo "# oc login https://10.1.2.2:8443/"
+echo " delete old project"
+pe "oc delete project mydemoproject"
+pe "oc version"
+echo "# Get nodes info"
+pe "oc get nodes"
+echo "# Lets create project and run a run a pod now."
+pe "oc new-project mydemoproject --display-name=MyDemoProject"
+echo "# Quota that controls object counts"
+pe "cat ./configs/object-counts.yaml"
+echo " "
+pe "oc create -f ./configs/object-counts.yaml --namespace=mydemoproject"
+echo "# describe the quota to see what is currently being consumed"
+pe "oc describe quota object-counts --namespace=mydemoproject"
+echo "cat ./configs/compute-resources.yaml"
+echo " "
+pe "oc create -f ./configs/compute-resources.yaml --namespace=mydemoproject"
+echo "# see what is currently being consumed"
+pe "oc describe quota compute-resources --namespace=mydemoproject"
+echo "# Limits=Doorman. Assings default/Min/Max/overcommit-ratio."
+pe "cat ./configs/limits-range.yaml"
+echo " "
+pe "oc create -f  ./configs/limits-range.yaml --namespace=mydemoproject"
+pe "oc run ngnix-server --image=nginx --replicas=2 --port=80 --labels=\"env=QA,AppName=AddressLookup,Owner=Anurag,version=1.4\" --limits=\"cpu=250m,memory=200Mi\" --requests=\"cpu=150m,memory=100Mi\" "
+pe "oc get pods"
+echo "# get all artifacts. Check out the DC and RC"
+echo "# lets review the replication controler"
+pe "oc get dc"
+pe "oc edit dc ngnix-server"
+pe "oc edit rc ngnix-server-1 -o yaml"
+echo "# Get some help"
+pe "oc expose rc -h"
+pe "oc expose dc ngnix-server --port=80 --type=LoadBalancer --name=service-ngnix"
+pe "oc describe service service-ngnix"
+pe "oc describe service service-ngnix"
+pe "oc describe service service-ngnix"
+echo "# Curl to the Pod and service end points."
+echo "# expose a service for external access"
+pe "oc expose svc service-ngnix --name=rt-ngnix"
+echo "# Review limits/quota Results"
+pe "oc describe quota compute-resources --namespace=mydemoproject"
+pe "oc describe quota object-counts --namespace=mydemoproject"

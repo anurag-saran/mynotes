@@ -1,0 +1,5 @@
+
+minus the rsyslog part
+https://github.com/makentenza/ocp-template-splunk-forwarder
+https://bugzilla.redhat.com/show_bug.cgi?id=1327101#c31
+2nd Option: https://github.com/noelo/ocp-splunk

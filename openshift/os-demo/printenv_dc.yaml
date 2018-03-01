@@ -1,0 +1,79 @@
+apiVersion: v1
+kind: DeploymentConfig
+metadata:
+  annotations:
+    openshift.io/generated-by: OpenShiftNewApp
+  creationTimestamp: null
+  generation: 7
+  labels:
+    app: printenv
+  name: printenv
+spec:
+  replicas: 1
+  selector:
+    app: printenv
+    deploymentconfig: printenv
+  strategy:
+    resources: {}
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 25%
+      maxUnavailable: 25%
+      timeoutSeconds: 600
+      updatePeriodSeconds: 1
+    type: Rolling
+  template:
+    metadata:
+      annotations:
+        openshift.io/container.printenv.image.entrypoint: '["container-entrypoint","/bin/sh","-c","$STI_SCRIPTS_PATH/usage"]'
+        openshift.io/generated-by: OpenShiftNewApp
+      creationTimestamp: null
+      labels:
+        app: printenv
+        deploymentconfig: printenv
+    spec:
+      containers:
+      - env:
+        - name: APP_VAR_1
+          value: Value1
+        - name: APP_VAR_2
+          value: Value2
+        - name: appvar3
+          valueFrom:
+            configMapKeyRef:
+              key: appvar3
+              name: printenv-config
+        - name: appvar4
+          valueFrom:
+            configMapKeyRef:
+              key: appvar4
+              name: printenv-config
+        image: 172.30.250.207:5000/a-boademo/printenv@sha256:0a17895b72876d891e06801394a64c314332eee66d903d318020a91b68cccd4c
+        imagePullPolicy: Always
+        name: printenv
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+  test: false
+  triggers:
+  - type: ConfigChange
+  - imageChangeParams:
+      automatic: true
+      containerNames:
+      - printenv
+      from:
+        kind: ImageStreamTag
+        name: printenv:latest
+        namespace: a-boademo
+    type: ImageChange
+status:
+  availableReplicas: 1
+  observedGeneration: 7
+  replicas: 1
+  updatedReplicas: 1

@@ -1,0 +1,49 @@
+https://www.jfrog.com/confluence/display/RTF/Running+Artifactory+OSS
+
+docker pull docker.bintray.io/jfrog/artifactory-oss:latest
+The -v flags specify volume mounts to use. You could use whichever volume mounts you like, but the ones specified above follow JFrog’s suggestions. To configure them correctly, you should run
+
+
+export ARTIFACTORY_HOME=/var/opt/jfrog/artifactory
+docker run -d --name artifactory -p 80:80 -p 8081:8081 -p 443:443 \
+-v $ARTIFACTORY_HOME/data \
+-v $ARTIFACTORY_HOME/logs \
+-v $ARTIFACTORY_HOME/backup \
+-v $ARTIFACTORY_HOME/etc \
+docker.bintray.io/jfrog/artifactory-oss:latest
+
+## Install Artifactory on OpensShift
+
+
+### Create Project
+`oc new-project artifactory-oss`
+
+### Create Service account to run CF as
+`oc create serviceaccount arti-sa -n artifactory-oss`
+
+### Enable cloudforms to run as root
+`oc adm policy add-scc-to-user privileged system:serviceaccount:artifactory-oss:arti-sa`
+
+### Create deployment
+`oc new-app docker.bintray.io/jfrog/artifactory-oss:latest`
+
+### Enable CF to run as root (thx Ed Seymour for the patch )
+`oc patch dc artifactory-oss  -p '{"spec":{"template":{"spec":{"containers":[{"name":"artifactory-oss","securityContext":{ "privileged":true } }],"serviceAccountName":"arti-sa"}}}}'`
+
+Did not need the below step:
+So we know why it failed, how do we fix this? Well ideally we fix the original docker image to not run as root. If this is not 
+possible then we can tell OpenShift to allow this project to run as root using the below command to change the security context 
+constraints (see manual for these here):
+
+# oadm policy add-scc-to-user anyuid -z default
+Just to describe the above command, we are going to add a security constraint (or rather we are going to relax a default setting 
+which would normally prohibit containers running as root). The -z in the command  indicates that we are going to add a capability 
+to the service account (this is the user that by default is used to run containers within our current namespace – i.e. our project 
+innovation-2016) and the command add the “run as any user” capability, i.e. we are no longer prohibited from running as root.
+
+### Give cluster read permissions 
+` ??? oc adm policy add-cluster-role-to-user cluster-admin system:serviceaccount:artifactory:arti-sa`
+
+### Get service token
+
+`oc sa  get-token arti_sa`

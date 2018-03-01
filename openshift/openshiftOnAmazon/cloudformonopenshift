@@ -1,0 +1,92 @@
+
+Link: https://github.com/debianmaster/openshift-examples/blob/master/cloudforms-on-openshift/README.md
+
+
+username/password:    admin/smartvm     
+Hit https://cfme4-cloudforms.10.0.0.249.xip.io/ems_container/new     
+
+Endpoints     
+kubernetes.default.svc.cluster.local    port 443  and token
+  
+Hawkular    
+provide hawkular skydns   i.e.   hawkular-metrics.openshift-infra.svc.cluster.local  
+
+### Wait for some time for results to show up  
+
+Also you need to enable 3 "Capacity & Utilization" tasks. It's Under top right Administrator > Configuration > Server Control
+Capacity & Utilization Coordinator
+Capacity & Utilization Data Collector
+Capacity & Utilization Data Processor
+
+https://access.redhat.com/documentation/en/red-hat-cloudforms/4.2/paged/integration-with-red-hat-openshift-enterprise/
+
+Hawkular : --> hawkular-metrics.apps.anuragsdemo.com
+
+oc sa get-token -n management-infra management-admin
+Follow Steps at : https://access.redhat.com/documentation/en/red-hat-cloudforms/4.2/single/integration-with-red-hat-openshift-enterprise/#integration
+Navigate to Compute → Containers → Providers.
+Click  1847 (Configuration), then click  1862 (Add a New Containers Provider).
+Enter a Name for the provider.
+From the Type list, select OpenShift Enterprise.
+Enter the appropriate Zone for the provider. By default, the zone is set to default.
+In the Default tab of the Endpoints section, enter the fully qualified domain name of the provider in the Hostname (or IPv4 or IPv6 address) field.
+Enter the Port of the provider. The default port is 8443.
+In the Token and Confirm Token fields, enter token obtained earlier in Section 3, “Retrieving the OpenShift Enterprise Management Token”.
+Click Validate to confirm that the Red Hat CloudForms can connect to the OpenShift Enterprise provider using the provided token.
+Next, click the Hawkular tab. From there, enter the HAWKULARHOST (from Section 2.3, “Deploying the Metrics Components”) in the Hostname (or IPv4 or IPv6 address) field.
+Enter the Port of the HAWKULARHOST. The default port is 443.
+Click Add.
+
+###################
+Link : https://access.redhat.com/documentation/en/red-hat-cloudforms/4.2/paged/installing-red-hat-cloudforms-on-openshift-container-platform/
+Logs of cloudforms : /var/www/miq/vmdb/log/evm.log
+
+oc new-project cloudforms42 \
+--description="Cloudforms 42" \
+--display-name="cloudforms 4.2"
+
+oadm policy add-scc-to-user privileged system:serviceaccount:cloudforms42:default
+oc describe scc privileged | grep Users
+Create a file using the below template.
+https://raw.githubusercontent.com/openshift/openshift-ansible/master/roles/openshift_examples/files/examples/v1.4/cfme-templates/cfme-template.yaml
+Dont use: oc new-app registry.access.redhat.com/cloudforms/cfme4
+oc create -f cfme42temp.yaml -n cloudforms42
+oc process --parameters -n cloudforms42 cloudforms
+oc new-app --template=cloudforms
+
+kubectl patch pv <your-pv-name> -p '{"spec":{"persistentVolumeReclaimPolicy":"Retain"}}'
+
+###
+lifecycle:
+          preStop:
+            exec:
+              command:
+              - /opt/rh/cfme-container-scripts/sync-pv-data
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /
+            port: 80
+            scheme: HTTP
+          initialDelaySeconds: 480
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 3
+        name: cloudforms
+        ports:
+        - containerPort: 80
+          protocol: TCP
+        - containerPort: 443
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /
+            port: 80
+            scheme: HTTP
+          initialDelaySeconds: 200
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 3
+        resources:
+          requests:

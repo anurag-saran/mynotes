@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: object-counts
+spec:
+  hard:
+    persistentvolumeclaims: "8"
+    services: "10"
+    pods: "20"
