@@ -1,4 +1,4 @@
-AMQ
+    AMQ
 https://katacoda.com/hguerrero/courses/amq/getting-started-interconnect https://github.com/jbossdemocentral/amq-ha-replicated-demo https://github.com/hguerrero/amq7-broker-workshop/blob/master/labs/lab02-creating-a-broker-instance.md
 
 QTools: https://github.com/ssorj/qtools

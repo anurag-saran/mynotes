@@ -1,0 +1,39 @@
+anurags-MacBook-Pro-2:Mortgage-demo anuragsaran$ pwd
+/Users/anuragsaran/Documents/MW/bpms/Mortgage-demo
+
+=  You can now start the JBoss BPM Suite with:                             =
+=                                                                          =
+=   ./target/jboss-eap-7.0/bin/standalone.sh                               =
+=                                                                          =
+=  Login into business central at:                                         =
+=                                                                          =
+=    http://localhost:8080/business-central  (u:bpmsAdmin / p:bpmsuite1!)  =
+=                                                                          =
+=  See README.md for general details to run the various demo cases.        =
+=                                                                          =
+= PRE-LOAD DEMO                                                            =
+= =============                                                            =
+= To load the BPM with a set of process instances, you can run the         =
+= followin command after you start JBoss BPM Suite, build and deploy the   =
+= mortgage project, then you can use the helper jar file found in the      =
+= support directory as follows:                                            =
+=                                                                          =
+=   java -jar jboss-mortgage-demo-client.jar erics bpmsuite1!              =
+=                                                                          =
+=  JBoss BPM Suite 6.4 Mortgage Demo Setup Complete.  
+
+https://github.com/entando/fsi-onboarding-bpm
+account
+adminadmin
+legal
+adminadmin
+
+Manager
+adminadmin
+
+https://access.redhat.com/solutions/887653
+https://access.redhat.com/solutions/887653
+https://github.com/tariq-islam/epa_mda
+
+
+New persistent Decision Central and Decision Server applications have been created in your project. The user name/password for accessing the Decision Central interface is adminUser/123Changeme@. The user name/password for calls to the Decision Server is executionUser/123Changeme@. Please be sure to create the "decisioncentral-service-account" and "kieserver-service-account" service accounts and the secrets named "decisioncentral-app-secret" and "kieserver-app-secret" containing the keystore.jks and keystore.jksfiles used for serving secure content. Only stateless API calls to the Decision Server are supported.

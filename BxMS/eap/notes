@@ -1,0 +1,20 @@
+Q1: JBOSS Vs Weblogic /Websphere
+https://www.redhat.com/cms/managed-files/mi-jboss-enterprise-application-platform-ibm-websphere-java-competitive-review-f6895kc-201704-en.pdf
+https://www.redhat.com/cms/managed-files/mi-jboss-enterprise-application-platform-oracle-weblogic-java-competitive-review-201612-en.pdf
+
+Q2: containerization benefits of JBOSS. Is there a thinner [non – j2EE version] available as well?
+
+https://developers.redhat.com/products/rhoar/overview/
+Multiple Runtimes: EAP, Ecliplse Vert.x, Wildfly Swarm, Node.js
+Multiple FrameWorks: Spring Boot, Netflix Ribbob, Netflix, Hystrix
+https://developers.redhat.com/blog/2018/03/12/rhoar-nodejs-annoucement/#more-464817
+
+Coherence vs JBoss Data Grid or Infinispan
+
+Clustered JMS Queues for JBOSS. [is there an option]? /AMQ.
+CEP solution from JBOSS.
+
+Spring Boot Support. [When is it coming?]
+https://www.youtube.com/watch?v=qjm_-RRTVFE&t=2112s '
+
+{401=Unauthorized! Token may have expired! Please log-in again., 403=Forbidden! User developer/oc-cluster-anuragsdemo-club:8443 doesn't have permission.}
