@@ -13,10 +13,11 @@ registries = ['localhost:5000']
 
 To list all repositories available in a registry, use the /v2/_catalog endpoint. The n parameter is used to limit the number of repositories to return:
 ```[user@host ~]$ curl -Ls https://myserver/v2/_catalog?n=3
-{"repositories":["centos/httpd","do180/custom-httpd","hello-openshift"]}'
+{"repositories":["centos/httpd","do180/custom-httpd","hello-openshift"]}
+```
 
 The /v2/<name>/tags/list endpoint provides the list of tags available for a single image:
-'[user@host ~]$ curl -Ls \
+```[user@host ~]$ curl -Ls \
 > https://quay.io/v2/redhattraining/httpd-parent/tags/list \
 > | python -m json.tool
 {
