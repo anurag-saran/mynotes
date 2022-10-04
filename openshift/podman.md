@@ -1,3 +1,4 @@
+# Managing Images
 To configure registries for the podman command, you need to update the /etc/containers/registries.conf file. 
 Edit the registries entry in the [registries.search] section, adding an entry to the values list:
 ```[registries.search]
@@ -53,6 +54,15 @@ Then, include this token in a Bearer authorization header in subsequent requests
       "1.2",
 ...output omitted...
 ```
-  
+
+Pulling Images
+To pull container images from a registry, use the podman pull command:
+```
+[user@host ~]$ podman pull [OPTIONS] [REGISTRY[:PORT]/]NAME[:TAG]
+[user@host ~]$ podman pull quay.io/bitnami/nginx
+[user@host ~]$ podman images
+[user@host ~]$ podman pull registry.redhat.io/rhel8/mysql-80:1
+[user@host ~]$ podman run registry.redhat.io/rhel8/mysql-80:1
+ ``` 
 
 
