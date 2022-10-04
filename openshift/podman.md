@@ -39,7 +39,8 @@ Some container image registries require access authorization. The podman login c
 ```
 [user@host ~]$ podman login -u username \
 > -p password registry.access.redhat.com
-Login Succeeded!```
+Login Succeeded!
+```
   
 The registry HTTP API requires authentication credentials. First, use the Red Hat Single Sign On (SSO) service to obtain an access token:
 ```
