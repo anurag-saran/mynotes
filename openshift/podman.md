@@ -11,7 +11,7 @@ registries = ['localhost:5000']
 ```
 
 To list all repositories available in a registry, use the /v2/_catalog endpoint. The n parameter is used to limit the number of repositories to return:
-'[user@host ~]$ curl -Ls https://myserver/v2/_catalog?n=3
+```[user@host ~]$ curl -Ls https://myserver/v2/_catalog?n=3
 {"repositories":["centos/httpd","do180/custom-httpd","hello-openshift"]}'
 
 The /v2/<name>/tags/list endpoint provides the list of tags available for a single image:
@@ -25,24 +25,25 @@ The /v2/<name>/tags/list endpoint provides the list of tags available for a sing
         "2.4"
     ]
 }
-'
+```
 
 Registry Authentication
 Some container image registries require access authorization. The podman login command allows username and password authentication to a registry:
   
-'[user@host ~]$ podman login -u username \
+```[user@host ~]$ podman login -u username \
 > -p password registry.access.redhat.com
-Login Succeeded!'
+Login Succeeded!```
   
 The registry HTTP API requires authentication credentials. First, use the Red Hat Single Sign On (SSO) service to obtain an access token:
-'[user@host ~]$ curl -u username:password -Ls \
+```[user@host ~]$ curl -u username:password -Ls \
 > "https://sso.redhat.com/auth/realms/rhcc/protocol/redhat-docker-v2/auth?service=docker-registry"
 {"token":"eyJh...o5G8",
 "access_token":"eyJh...mgL4",
-"expires_in":...output omitted...}[user@host ~]$'
+"expires_in":...output omitted...}[user@host ~]$
+```
  
 Then, include this token in a Bearer authorization header in subsequent requests:
-'[user@host ~]$ curl -H "Authorization: Bearer eyJh...mgL4" \
+```[user@host ~]$ curl -H "Authorization: Bearer eyJh...mgL4" \
 >  -Ls https://registry.redhat.io/v2/rhel8/mysql-80/tags/list \
 >  | python -mjson.tool
 {
@@ -50,7 +51,8 @@ Then, include this token in a Bearer authorization header in subsequent requests
     "tags": [
       "1.0",
       "1.2",
-...output omitted...'
+...output omitted...
+```
   
 
 
