@@ -1,12 +1,14 @@
 To configure registries for the podman command, you need to update the /etc/containers/registries.conf file. 
 Edit the registries entry in the [registries.search] section, adding an entry to the values list:
-'[registries.search]'
-'registries = ["registry.access.redhat.com", "quay.io"]'
+```[registries.search]
+registries = ["registry.access.redhat.com", "quay.io"]
+```
 
 Secure connections to a registry require a trusted certificate. To support insecure connections, 
 add the registry name to the registries entry in [registries.insecure] section of /etc/containers/registries.conf file:
-'[registries.insecure]'
-'registries = ['localhost:5000']'
+```[registries.insecure]
+registries = ['localhost:5000']
+```
 
 To list all repositories available in a registry, use the /v2/_catalog endpoint. The n parameter is used to limit the number of repositories to return:
 '[user@host ~]$ curl -Ls https://myserver/v2/_catalog?n=3
