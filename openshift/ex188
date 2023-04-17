@@ -1,0 +1,94 @@
+# Podman basics
+```
+podman -v
+podman pull registry.redhat.io/rhel7/rhel:7.9
+podman login registry.redhat.io
+podman pull registry.redhat.io/rhel7/rhel:7.9
+podman images
+podman run registry.redhat.io/rhel7/rhel:7.9 echo 'Red Hat'
+podman ps
+podman run registry.redhat.io/rhel7/rhel echo "anurag"
+podman ps --all
+podman run --rm registry.redhat.io/rhel7/rhel:7.9 echo "a"
+podman images
+podman run --name podman_rhel7 registry.redhat.io/rhel7/rhel:7.9 echo 'Red Hat'
+podman ps --all
+podman ps --all --format-json
+podman ps --all --format=json
+podman run -p 8080:8080 podman run --name podman_rhel7 \
+podman run -p 8080:8080 registry.access.redhat.com/ubi8/httpd-24:latest
+podman run -p 8080:8080 registry.access.redhat.com/ubi8/httpd-24:latest 
+podman run -d -p 8080:8080 registry.access.redhat.com/ubi8/httpd-24:latest
+podman ps --all
+podman run -e NAME="Anurag" registry.redhat.io/rhel7/rhel:7.9 printenv NAME
+
+
+podman pull registry.ocp4.example.com:8443/ubi8/ubi-minimal:8.5
+podman run -e GREET=Hello -e NAME='Red Hat' registry.ocp4.example.com:8443/ubi8/ubi-minimal:8.5 printenv GREET NAME
+podman run -p 8080:8080 registry.ocp4.example.com:8443/ubi8/httpd-24
+podman run -d -p 8080:8080 registry.ocp4.example.com:8443/ubi8/httpd-24
+```
+
+# Networking
+```
+podman network create
+Creates a new Podman network. This command accepts various options to configure properties of the network, including gateway address, subnet mask, and whether to use IPv4 or IPv6.
+
+podman network ls
+Lists existing networks and a brief summary of each. Options for this command include various filters and an output format to list other values for each network.
+
+podman network inspect
+Outputs a detailed JSON object containing configuration data for the network.
+
+podman network rm
+Removes a network.
+
+podman network prune
+Removes any networks that are not currently in use by any running containers.
+
+podman network connect
+Connects an already running container to or from an existing network. Alternatively, connect containers to a Podman network on container creation by using the --net option. The disconnect command disconnects a container from a network.
+
+podman run -d --name my-container     --net example-net quay.io/rdacosta/my_httpd:latest
+podman run -d --name double-connector --net postgres-net,redis-net quay.io/rdacosta/my_httpd:latest
+
+Enabling Domain Name Resolution
+When using the default network, the domain name system (DNS) is disabled and can only be enabled by overwriting the default network, which is not covered in this course. To use DNS, create a new Podman network and connect your containers to that network.
+
+When using a network with DNS enabled, a container’s hostname is the name assigned to the container. For example, if a container is started with the following command, then the other containers on the test-net network can make requests to it using the hostname basic-container. This means that the name basic-container resolves to the current IP address of the basic-container container.
+
+[user@host ~]$ podman run --net test-net --name basic-container example-image
+
+[user@host ~]$ podman run -p 8075:80 my-app
+Without a host specified, the container is assigned the broadcast address (0.0.0.0). This means that the container is accessible from all networks on the host machine.
+
+To publish a container to a specific host and to limit the networks it is accessible from, use the following form.
+
+[user@host ~]$ podman run -p 127.0.0.1:8075:80 my-app
+
+podman port my-app
+podman port --all
+[user@host ~]$ podman inspect my-app \
+ -f '{{.NetworkSettings.Networks.apps.IPAddress}}'
+```
+
+podman run --name cities-app91 \
+--network cities -p 8091:8090 -d \
+registry.ocp4.example.com:8443/redhattraining/podman-info-cities:v0.1
+
+Accessing Containers
+ 363  2023-04-17 13:15:10 podman run --name nginx -d -p 8080:8080   registry.ocp4.example.com:8443/redhattraining/podman-nginx-helloworld
+  364  2023-04-17 13:15:54 podman cp niinx:/var/log/nginx/error.log error.log
+  365  2023-04-17 13:16:03 podman cp nginx:/var/log/nginx/error.log error.log
+  366  2023-04-17 13:16:08 ls -lart
+  367  2023-04-17 13:16:21 gedit error.log
+  368  2023-04-17 13:16:56 podman exec nginx ls /usr/share/nginc/html/public
+  369  2023-04-17 13:17:19 podman exec nginx ls /usr/share/nginx/html
+  370  2023-04-17 13:18:02 podman cp nginx:/etc/nginx/nginx.conf nginx.conf
+  371  2023-04-17 13:18:09 gedit nginx.conf
+  372  2023-04-17 13:18:20 podman cp nginx.conf nginx:/etc/nginx/nginx.conf
+  373  2023-04-17 13:18:29 podman exec nginx nginx -s reload
+  
+  
+  
+
