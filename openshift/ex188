@@ -76,6 +76,23 @@ podman run --name cities-app91 \
 --network cities -p 8091:8090 -d \
 registry.ocp4.example.com:8443/redhattraining/podman-info-cities:v0.1
 
+open an interactive shell in a running container, combine the --interactive and --tty options:
+podman exec -til /bin/bash
+
+podman exec nginx ls /usr/share/nginx/html
+podman cp nginx:/etc/nginx/nginx.conf nginx.conf
+podman exec nginx nginx -s reload
+
+podman ps --all
+podman stop --all
+podman stop --time=100
+podman kill httpd
+podman pause 4f2038c05b8c
+podman unpause 4f2038c05b8c
+podman rm --all
+podman run --name httpd -d -p \
+ 8080:8080 registry.ocp4.example.com:8443/ubi8/httpd-24
+ 
 Accessing Containers
  363  2023-04-17 13:15:10 podman run --name nginx -d -p 8080:8080   registry.ocp4.example.com:8443/redhattraining/podman-nginx-helloworld
   364  2023-04-17 13:15:54 podman cp niinx:/var/log/nginx/error.log error.log
@@ -89,6 +106,119 @@ Accessing Containers
   372  2023-04-17 13:18:20 podman cp nginx.conf nginx:/etc/nginx/nginx.conf
   373  2023-04-17 13:18:29 podman exec nginx nginx -s reload
   
+  podman search nginx
+  podman pull registry.redhat.io/rhel8/mariadb-103:1
+  podman image prune -af
+  podman rmi --all
+  podman build -f Containerfile -t simple-server
+  Remove all the unused images to recover storage space. Use the podman image prune command with the -a option to remove all unused images and the -f option to avoid confirmation.
+  podman image prune -af
   
+  
+  # This is a comment line 1
+FROM        registry.redhat.io/ubi8/ubi:8.6 2
+LABEL       description="This is a custom httpd container image" 3
+RUN         yum install -y httpd 4
+EXPOSE      80 5
+ENV         LogLevel "info" 6
+ADD         http://someserver.com/filename.pdf /var/www/html 7
+COPY        ./src/   /var/www/html/ 8
+USER        apache 9
+ENTRYPOINT  ["/usr/sbin/httpd"] 10
+CMD         ["-D", "FOREGROUND"] 11
+
+	
+ENTRYPOINT specifies the default command to execute when the image runs in a container.
+CMD provides the default arguments for the ENTRYPOINT instruction.
+When a Containerfile specifies both ENTRYPOINT and CMD then CMD changes its behavior. In this case the values provided to CMD are passed as default arguments to the ENTRYPOINT.
+
+
+
+FROM registry.ocp4.example.com:8443/ubi8/nodejs-16
+LABEL org.opencontainers.image.authors="Your Name"
+LABEL com.example.environment="production"
+LABEL com.example.version="0.0.1"
+ENV SERVER_PORT=3000
+ENV NODE_ENV="production"
+EXPOSE $SERVER_PORT
+WORKDIR /opt/app-root/src
+COPY . .
+RUN npm install
+CMD npm start
+
+When you build the container image, use the --build-arg flag to set the value, such as podman build --build-arg key=example-value for the preceding example.
+
+
+ARG VERSION="1.16.8" \
+    BIN_DIR=/usr/local/bin/
+ENV VERSION=${VERSION} \
+    BIN_DIR=${BIN_DIR}
+RUN curl "https://dl.example.io/${VERSION}/example-linux-amd64" \
+        -o ${BIN_DIR}/example
+
+ARG VERSION \
+    BIN_DIR
+ENV VERSION=${VERSION:-1.16.8} \
+    BIN_DIR=${BIN_DIR:-/usr/local/bin/}
+RUN curl "https://dl.example.io/${VERSION}/example-linux-amd64" \
+        -o ${BIN_DIR}/example
+        
+FROM registry.redhat.io/rhel9/postgresql-13:1
+VOLUME /var/lib/pgsql/data
+
+podman inspect VOLUME_ID
+
+
+# First stage
+FROM registry.access.redhat.com/ubi8/nodejs-14:1 as builder 
+COPY ./ /opt/app-root/src/
+RUN npm install
+RUN npm run build 
+
+# Second stage
+FROM registry.access.redhat.com/ubi8/nodejs-14-minimal:1 
+COPY --from=builder /opt/app-root/src/ /opt/app-root/src/ 
+EXPOSE 8080
+CMD node dist/index.js
+
+	
+Copy the application files to the directory where NGINX serves content by default. The --from flag indicates that the files are copied from the builder stage.
+podman build --squash-all -t localhost/squashed .
+
+
+FROM registry.ocp4.example.com:8443/redhattraining/podman-random-numbers as generator
+RUN python3 random_generator.py
+
+FROM registry.ocp4.example.com:8443/ubi8/python-38:1-96
+USER default
+WORKDIR /redhat
+COPY --from=generator --chown=default /app/numbers.txt materials/numbers.txt
+COPY main.py .
+ENV FILE="/redhat/materials/numbers.txt"
+VOLUME /redhat/materials
+CMD python3 main.py
+
+cat /etc/subuid /etc/subgid
+sudo usermod --add-subuids 100000-165535 \
+  --add-subgids 100000-165535 student
+podman run -it registry.access.redhat.com/ubi9/ubi bash
+podman top e6116477c5c9 huser user
+
+
+
+FROM registry.ocp4.example.com:8443/redhattraining/podman-certificate-generator as certs
+RUN ./gen_certificates.sh
+FROM registry.ocp4.example.com:8443/ubi8/ubi
+RUN dnf module install -y nodejs:16 && \
+    groupadd -r student && useradd -r -m -g student student
+COPY --from=certs --chown=student:student /app/*.pem /etc/pki/tls/private/certs/
+COPY --chown=student:student . /app/
+ENV TLS_PORT=8443 \
+    HTTP_PORT=8080 \
+    CERTS_PATH="/etc/pki/tls/private/certs"
+WORKDIR /app
+RUN npm ci --omit=dev
+USER student
+ENTRYPOINT npm start
   
 
