@@ -241,5 +241,23 @@ podman run -e POSTGRESQL_ADMIN_PASSWORD=redhat --network lab-net \
   registry.ocp4.example.com:8443/redhattraining/podman-python-server ? WHY:Z
   
   
+  Verify the directory permissions in a new user namespace.
+  podman unshare ls -l --directory ~/www
+  podman run --rm \
+registry.ocp4.example.com:8443/redhattraining/podman-python-server id
+  
+  podman unshare chgrp -R 994 ~/www
+  podman unshare ls -ln --directory ~/www
+  
+  podman run --rm --name podman-server \
+  -v ~/www:/server:Z -p 8000:8000 \
+  registry.ocp4.example.com:8443/redhattraining/podman-python-server
+  
+  podman volume create html-vol
+  podman volume import html-vol index.tar.gz
+  podman run --rm --name podman-server -p 8000:8000 \
+   --mount 'type=volume,source=html-vol,destination=/server,ro' \
+   registry.ocp4.example.com:8443/redhattraining/podman-python-server
+  
   
 
